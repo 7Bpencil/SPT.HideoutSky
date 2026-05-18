@@ -6,23 +6,14 @@
 //
 
 using BepInEx;
-using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using EFT;
-using EFT.InventoryLogic;
-using EFT.UI.WeaponModding;
 using Newtonsoft.Json;
 using SevenBoldPencil.Common;
 using System;
 using System.IO;
 using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.Video;
-using SystemObject = System.Object;
 
 namespace SevenBoldPencil.HideoutSky
 {
@@ -284,7 +275,7 @@ namespace SevenBoldPencil.HideoutSky
         public static void WriteJson<T>(T data, string filePath)
         {
             var json = JsonConvert.SerializeObject(data);
-            SafeIO.WriteAllTextAsync(filePath, json);
+            File.WriteAllTextAsync(filePath, json);
         }
 #endif
     }
