@@ -37,20 +37,20 @@ namespace SevenBoldPencil.HideoutSky
         public static Plugin Instance;
 		public ManualLogSource LoggerInstance;
 
-        public static ConfigEntry<float> SunLightColorH;
-        public static ConfigEntry<float> SunLightColorS;
-        public static ConfigEntry<float> SunLightColorV;
+        public static ConfigEntry<float> SunlightColorH;
+        public static ConfigEntry<float> SunlightColorS;
+        public static ConfigEntry<float> SunlightColorV;
         public static ConfigEntry<float> SunElevationAngle;
         public static ConfigEntry<float> SunAzimuthAngle;
         public static ConfigEntry<float> SunIntensity;
         public static ConfigEntry<LightShadows> SunShadowType;
         public static ConfigEntry<float> SunShadowStrength;
 
-        public static ConfigEntry<float> CubemapTintH;
-        public static ConfigEntry<float> CubemapTintS;
-        public static ConfigEntry<float> CubemapTintV;
-        public static ConfigEntry<float> CubemapExposure;
-        public static ConfigEntry<float> CubemapRotation;
+        public static ConfigEntry<float> SkyboxTintH;
+        public static ConfigEntry<float> SkyboxTintS;
+        public static ConfigEntry<float> SkyboxTintV;
+        public static ConfigEntry<float> SkyboxExposure;
+        public static ConfigEntry<float> SkyboxRotation;
 
         public Option<SkyData> SkyData;
 
@@ -59,43 +59,43 @@ namespace SevenBoldPencil.HideoutSky
             Instance = this;
 			LoggerInstance = Logger;
 
-            SunLightColorH = Config.Bind<float>("Sunlight", "Color Hue", 0.08169935f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
-            SunLightColorS = Config.Bind<float>("Sunlight", "Color Saturation", 0.12f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
-            SunLightColorV = Config.Bind<float>("Sunlight", "Color Value", 1, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            SunlightColorH = Config.Bind<float>("Sunlight", "Color Hue", 0.08169935f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            SunlightColorS = Config.Bind<float>("Sunlight", "Color Saturation", 0.12f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            SunlightColorV = Config.Bind<float>("Sunlight", "Color Value", 1, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
             SunElevationAngle = Config.Bind<float>("Sunlight", "Elevation Angle", 27, new ConfigDescription("", new AcceptableValueRange<float>(0, 90)));
             SunAzimuthAngle = Config.Bind<float>("Sunlight", "Azimuth Angle", 148, new ConfigDescription("", new AcceptableValueRange<float>(0, 360)));
             SunIntensity = Config.Bind<float>("Sunlight", "Intensity", 0.6f, new ConfigDescription("", new AcceptableValueRange<float>(0f, 8f)));
             SunShadowType = Config.Bind<LightShadows>("Sunlight", "Shadow Type", LightShadows.Soft);
             SunShadowStrength = Config.Bind<float>("Sunlight", "Shadow Strength", 0.7f, new ConfigDescription("", new AcceptableValueRange<float>(0f, 1f)));
 
-            SunLightColorH.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunLightColor(skyData.Sunlight); } };
-            SunLightColorS.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunLightColor(skyData.Sunlight); } };
-            SunLightColorV.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunLightColor(skyData.Sunlight); } };
+            SunlightColorH.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightColor(skyData.Sunlight); } };
+            SunlightColorS.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightColor(skyData.Sunlight); } };
+            SunlightColorV.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightColor(skyData.Sunlight); } };
             SunElevationAngle.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunAngle(skyData.SunlightTransform); } };
             SunAzimuthAngle.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunAngle(skyData.SunlightTransform); } };
             SunIntensity.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunIntensity(skyData.Sunlight); } };
             SunShadowType.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunShadowType(skyData.Sunlight); } };
             SunShadowStrength.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunShadowStrength(skyData.Sunlight); } };
 
-            CubemapTintH = Config.Bind<float>("Skybox", "Tint Hue", 0, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
-            CubemapTintS = Config.Bind<float>("Skybox", "Tint Saturation", 0, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
-            CubemapTintV = Config.Bind<float>("Skybox", "Tint Value", 1, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
-            CubemapExposure = Config.Bind<float>("Skybox", "Exposure", 0.375f, new ConfigDescription("", new AcceptableValueRange<float>(0, 8)));
-            CubemapRotation = Config.Bind<float>("Skybox", "Rotation", 190, new ConfigDescription("", new AcceptableValueRange<float>(0, 360)));
+            SkyboxTintH = Config.Bind<float>("Skybox", "Tint Hue", 0, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            SkyboxTintS = Config.Bind<float>("Skybox", "Tint Saturation", 0, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            SkyboxTintV = Config.Bind<float>("Skybox", "Tint Value", 1, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            SkyboxExposure = Config.Bind<float>("Skybox", "Exposure", 0.375f, new ConfigDescription("", new AcceptableValueRange<float>(0, 8)));
+            SkyboxRotation = Config.Bind<float>("Skybox", "Rotation", 190, new ConfigDescription("", new AcceptableValueRange<float>(0, 360)));
 
-            CubemapTintH.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetCubemapTint(skyData.SkyboxMaterial); } };
-            CubemapTintS.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetCubemapTint(skyData.SkyboxMaterial); } };
-            CubemapTintV.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetCubemapTint(skyData.SkyboxMaterial); } };
-            CubemapExposure.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetCubemapExposure(skyData.SkyboxMaterial); } };
-            CubemapRotation.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetCubemapRotation(skyData.SkyboxMaterial); } };
+            SkyboxTintH.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxTint(skyData.SkyboxMaterial); } };
+            SkyboxTintS.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxTint(skyData.SkyboxMaterial); } };
+            SkyboxTintV.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxTint(skyData.SkyboxMaterial); } };
+            SkyboxExposure.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxExposure(skyData.SkyboxMaterial); } };
+            SkyboxRotation.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxRotation(skyData.SkyboxMaterial); } };
 
             new Patch_HideoutController_HideoutAwake().Enable();
             new Patch_HideoutController_OnDestroy().Enable();
         }
 
-        public void SetSunLightColor(Light sunLight)
+        public void SetSunlightColor(Light sunLight)
         {
-            sunLight.color = Color.HSVToRGB(SunLightColorH.Value, SunLightColorS.Value, SunLightColorV.Value);
+            sunLight.color = Color.HSVToRGB(SunlightColorH.Value, SunlightColorS.Value, SunlightColorV.Value);
         }
 
         public void SetSunAngle(Transform sunTransform)
@@ -118,19 +118,19 @@ namespace SevenBoldPencil.HideoutSky
             sunLight.shadowStrength = SunShadowStrength.Value;
         }
 
-        public void SetCubemapTint(Material skyboxMaterial)
+        public void SetSkyboxTint(Material skyboxMaterial)
         {
-            skyboxMaterial.SetColor(_Tint, Color.HSVToRGB(CubemapTintH.Value, CubemapTintS.Value, CubemapTintV.Value));
+            skyboxMaterial.SetColor(_Tint, Color.HSVToRGB(SkyboxTintH.Value, SkyboxTintS.Value, SkyboxTintV.Value));
         }
 
-        public void SetCubemapExposure(Material skyboxMaterial)
+        public void SetSkyboxExposure(Material skyboxMaterial)
         {
-            skyboxMaterial.SetFloat(_Exposure, CubemapExposure.Value);
+            skyboxMaterial.SetFloat(_Exposure, SkyboxExposure.Value);
         }
 
-        public void SetCubemapRotation(Material skyboxMaterial)
+        public void SetSkyboxRotation(Material skyboxMaterial)
         {
-            skyboxMaterial.SetFloat(_Rotation, CubemapRotation.Value);
+            skyboxMaterial.SetFloat(_Rotation, SkyboxRotation.Value);
         }
 
         public void LoadSkybox()
@@ -155,19 +155,19 @@ namespace SevenBoldPencil.HideoutSky
             var material = new Material(Shader.Find("Skybox/Cubemap"));
             var cubemap = LoadCubemap(Path.Combine(assemblyDir, "assets", "cubemap"));
             {
-                SetCubemapTint(material);
-                SetCubemapExposure(material);
-                SetCubemapRotation(material);
+                SetSkyboxTint(material);
+                SetSkyboxExposure(material);
+                SetSkyboxRotation(material);
                 material.SetTexture(_Tex, cubemap);
                 meshRenderer.material = material;
             }
 
-            var sunLight = new GameObject("SunLight");
+            var sunLight = new GameObject("Sunlight");
             var light = sunLight.AddComponent<Light>();
             var lightTransform = light.transform;
             {
                 light.type = LightType.Directional;
-                SetSunLightColor(light);
+                SetSunlightColor(light);
                 SetSunAngle(lightTransform);
                 SetSunIntensity(light);
                 SetSunShadowType(light);
