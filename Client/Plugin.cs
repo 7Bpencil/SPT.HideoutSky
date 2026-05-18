@@ -99,6 +99,9 @@ namespace SevenBoldPencil.HideoutSky
             CubemapTintV.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetCubemapTint(skyData.SkyboxMaterial); } };
             CubemapExposure.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetCubemapExposure(skyData.SkyboxMaterial); } };
             CubemapRotation.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetCubemapRotation(skyData.SkyboxMaterial); } };
+
+            new Patch_HideoutController_HideoutAwake().Enable();
+            new Patch_HideoutController_OnDestroy().Enable();
         }
 
         public void SetSunLightColor(Light sunLight)
@@ -139,14 +142,6 @@ namespace SevenBoldPencil.HideoutSky
         public void SetCubemapRotation(Material skyboxMaterial)
         {
             skyboxMaterial.SetFloat(_Rotation, CubemapRotation.Value);
-        }
-
-        public void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.F9))
-            {
-                LoadAtmosphere();
-            }
         }
 
         public void LoadAtmosphere()
