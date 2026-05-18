@@ -54,7 +54,7 @@ namespace SevenBoldPencil.HideoutSky
 		{
 			var ceiling = new HideoutCustomizationItemsInstaller_Proxy(___CustomizationItemsInstaller)._ceilingPoint;
 			ceiling.gameObject.SetActive(false);
-			Plugin.Instance.LoadAtmosphere();
+			Plugin.Instance.LoadSkybox();
 		}
 	}
 
@@ -68,8 +68,7 @@ namespace SevenBoldPencil.HideoutSky
         [PatchPostfix]
         public static void Postfix()
 		{
-			Logger.LogError($"Patch_HideoutController_OnDestroy");
-			// TODO unload skybox texture
+			Plugin.Instance.UnloadSkybox();
 		}
 	}
 }

@@ -24,15 +24,15 @@ using UnityEngine.Networking;
 using UnityEngine.Video;
 using SystemObject = System.Object;
 
-// TODO main light: Weather/Sky Dome/Light
-
 namespace SevenBoldPencil.HideoutSky
 {
     public class SkyData
     {
-        public Material SkyboxMaterial;
         public Light Sunlight;
         public Transform SunlightTransform;
+        public Material SkyboxMaterial;
+        public Cubemap SkyboxCubemap;
+        public Mesh SkyboxMesh;
     }
 
     [BepInPlugin("7Bpencil.HideoutSky", "7Bpencil.HideoutSky", "1.0.0")]
@@ -60,7 +60,6 @@ namespace SevenBoldPencil.HideoutSky
         public static ConfigEntry<float> CubemapTintV;
         public static ConfigEntry<float> CubemapExposure;
         public static ConfigEntry<float> CubemapRotation;
-        // TODO cubemap rotation speed
 
         public Option<SkyData> SkyData;
 
@@ -144,9 +143,8 @@ namespace SevenBoldPencil.HideoutSky
             skyboxMaterial.SetFloat(_Rotation, CubemapRotation.Value);
         }
 
-        public void LoadAtmosphere()
+        public void LoadSkybox()
         {
-            // TODO load and unload assets reasonably
             var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var bundlePath = Path.Combine(assemblyDir, "assets", "bundles", "hideout-sky");
             var bundle = AssetBundle.LoadFromFile(bundlePath);
@@ -165,8 +163,8 @@ namespace SevenBoldPencil.HideoutSky
 
             var meshRenderer = atmosphere.AddComponent<MeshRenderer>();
             var material = new Material(Shader.Find("Skybox/Cubemap"));
+            var cubemap = LoadCubemap(Path.Combine(assemblyDir, "assets", "cubemap"));
             {
-                var cubemap = LoadCubemap(Path.Combine(assemblyDir, "assets", "cubemap"));
                 SetCubemapTint(material);
                 SetCubemapExposure(material);
                 SetCubemapRotation(material);
@@ -188,9 +186,11 @@ namespace SevenBoldPencil.HideoutSky
 
             SkyData = new(new()
             {
-                SkyboxMaterial = material,
                 Sunlight = light,
                 SunlightTransform = lightTransform,
+                SkyboxMaterial = material,
+                SkyboxCubemap = cubemap,
+                SkyboxMesh = mesh,
             });
         }
 
@@ -208,9 +208,6 @@ namespace SevenBoldPencil.HideoutSky
             LoadCubemapFace(directoryPath, "top", texture);
             cube.SetPixels(texture.GetPixels(), CubemapFace.PositiveY);
 
-            LoadCubemapFace(directoryPath, "bottom", texture);
-            cube.SetPixels(texture.GetPixels(), CubemapFace.NegativeY);
-
             LoadCubemapFace(directoryPath, "front", texture);
             cube.SetPixels(texture.GetPixels(), CubemapFace.PositiveZ);
 
@@ -218,6 +215,8 @@ namespace SevenBoldPencil.HideoutSky
             cube.SetPixels(texture.GetPixels(), CubemapFace.NegativeZ);
 
             cube.Apply();
+
+            Destroy(texture);
 
             return cube;
         }
@@ -229,6 +228,17 @@ namespace SevenBoldPencil.HideoutSky
             if (!ImageConversion.LoadImage(texture, fileBytes, markNonReadable: false))
             {
                 throw new Exception($"Failed to load cubemap: {filePath}");
+            }
+        }
+
+        public void UnloadSkybox()
+        {
+            if (SkyData.Some(out var skyData))
+            {
+                SkyData = default;
+                Destroy(skyData.SkyboxCubemap);
+                Destroy(skyData.SkyboxMaterial);
+                Destroy(skyData.SkyboxMesh);
             }
         }
 
