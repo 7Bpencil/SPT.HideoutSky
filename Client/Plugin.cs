@@ -194,44 +194,42 @@ namespace SevenBoldPencil.HideoutSky
             });
         }
 
-        // TODO switch to equirectangular
         public static Cubemap LoadCubemap(string directoryPath)
         {
-            // TODO this loads six textures at the same time,
-            // we could load one after another to keep it sane
-            var right  = LoadCubemapFace(directoryPath, "right");
-            var left   = LoadCubemapFace(directoryPath, "left");
-            var top    = LoadCubemapFace(directoryPath, "top");
-            var bottom = LoadCubemapFace(directoryPath, "bottom");
-            var front  = LoadCubemapFace(directoryPath, "front");
-            var back   = LoadCubemapFace(directoryPath, "back");
+            var texture = new Texture2D(2, 2, TextureFormat.RGBA32, mipChain: false, linear: false, createUninitialized: true);
 
-            var size = right.width;
-            var cube = new Cubemap(size, TextureFormat.RGBA32, false, false);
+            LoadCubemapFace(directoryPath, "right", texture);
+            var cube = new Cubemap(texture.width, TextureFormat.RGBA32, false, false);
+            cube.SetPixels(texture.GetPixels(), CubemapFace.PositiveX);
 
-            cube.SetPixels(right.GetPixels(), CubemapFace.PositiveX);
-            cube.SetPixels(left.GetPixels(), CubemapFace.NegativeX);
-            cube.SetPixels(top.GetPixels(), CubemapFace.PositiveY);
-            cube.SetPixels(bottom.GetPixels(), CubemapFace.NegativeY);
-            cube.SetPixels(front.GetPixels(), CubemapFace.PositiveZ);
-            cube.SetPixels(back.GetPixels(), CubemapFace.NegativeZ);
+            LoadCubemapFace(directoryPath, "left", texture);
+            cube.SetPixels(texture.GetPixels(), CubemapFace.NegativeX);
+
+            LoadCubemapFace(directoryPath, "top", texture);
+            cube.SetPixels(texture.GetPixels(), CubemapFace.PositiveY);
+
+            LoadCubemapFace(directoryPath, "bottom", texture);
+            cube.SetPixels(texture.GetPixels(), CubemapFace.NegativeY);
+
+            LoadCubemapFace(directoryPath, "front", texture);
+            cube.SetPixels(texture.GetPixels(), CubemapFace.PositiveZ);
+
+            LoadCubemapFace(directoryPath, "back", texture);
+            cube.SetPixels(texture.GetPixels(), CubemapFace.NegativeZ);
 
             cube.Apply();
 
             return cube;
         }
 
-        public static Texture2D LoadCubemapFace(string directoryPath, string faceName)
+        public static void LoadCubemapFace(string directoryPath, string faceName, Texture2D texture)
         {
             var filePath = Path.Combine(directoryPath, $"{faceName}.png");
             var fileBytes = File.ReadAllBytes(filePath);
-            var texture = new Texture2D(2, 2, TextureFormat.RGBA32, mipChain: false, linear: false, createUninitialized: true);
-            if (ImageConversion.LoadImage(texture, fileBytes, markNonReadable: false))
+            if (!ImageConversion.LoadImage(texture, fileBytes, markNonReadable: false))
             {
-                return texture;
+                throw new Exception($"Failed to load cubemap: {filePath}");
             }
-
-            throw new Exception($"Failed to load cubemap: {filePath}");
         }
 
 #if DEBUG
