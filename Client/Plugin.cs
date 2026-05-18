@@ -68,15 +68,14 @@ namespace SevenBoldPencil.HideoutSky
             Instance = this;
 			LoggerInstance = Logger;
 
-            // TODO make proper setting groups
-            SunLightColorH = Config.Bind<float>("Main", "Sun | Light Color Hue", 0.08169935f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
-            SunLightColorS = Config.Bind<float>("Main", "Sun | Light Color Saturation", 0.4f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
-            SunLightColorV = Config.Bind<float>("Main", "Sun | Light Color Value", 1f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
-            SunElevationAngle = Config.Bind<float>("Main", "Sun | Elevation Angle", 27f, new ConfigDescription("", new AcceptableValueRange<float>(0, 90)));
-            SunAzimuthAngle = Config.Bind<float>("Main", "Sun | Azimuth Angle", 148f, new ConfigDescription("", new AcceptableValueRange<float>(0, 360)));
-            SunIntensity = Config.Bind<float>("Main", "Sun | Intensity", 0.6f, new ConfigDescription("", new AcceptableValueRange<float>(0f, 8f)));
-            SunShadowType = Config.Bind<LightShadows>("Main", "Sun | Shadow Type", LightShadows.Soft);
-            SunShadowStrength = Config.Bind<float>("Main", "Sun | Shadow Strength", 1f, new ConfigDescription("", new AcceptableValueRange<float>(0f, 1f)));
+            SunLightColorH = Config.Bind<float>("Sunlight", "Color Hue", 0.08169935f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            SunLightColorS = Config.Bind<float>("Sunlight", "Color Saturation", 0.12f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            SunLightColorV = Config.Bind<float>("Sunlight", "Color Value", 1, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            SunElevationAngle = Config.Bind<float>("Sunlight", "Elevation Angle", 27, new ConfigDescription("", new AcceptableValueRange<float>(0, 90)));
+            SunAzimuthAngle = Config.Bind<float>("Sunlight", "Azimuth Angle", 148, new ConfigDescription("", new AcceptableValueRange<float>(0, 360)));
+            SunIntensity = Config.Bind<float>("Sunlight", "Intensity", 0.6f, new ConfigDescription("", new AcceptableValueRange<float>(0f, 8f)));
+            SunShadowType = Config.Bind<LightShadows>("Sunlight", "Shadow Type", LightShadows.Soft);
+            SunShadowStrength = Config.Bind<float>("Sunlight", "Shadow Strength", 0.7f, new ConfigDescription("", new AcceptableValueRange<float>(0f, 1f)));
 
             SunLightColorH.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunLightColor(skyData.Sunlight); } };
             SunLightColorS.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunLightColor(skyData.Sunlight); } };
@@ -87,11 +86,11 @@ namespace SevenBoldPencil.HideoutSky
             SunShadowType.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunShadowType(skyData.Sunlight); } };
             SunShadowStrength.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunShadowStrength(skyData.Sunlight); } };
 
-            CubemapTintH = Config.Bind<float>("Main", "Cubemap | Tint Hue", 0f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
-            CubemapTintS = Config.Bind<float>("Main", "Cubemap | Tint Saturation", 0f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
-            CubemapTintV = Config.Bind<float>("Main", "Cubemap | Tint Value", 0.8f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
-            CubemapExposure = Config.Bind<float>("Main", "Cubemap | Exposure", 0.3f, new ConfigDescription("", new AcceptableValueRange<float>(0, 8)));
-            CubemapRotation = Config.Bind<float>("Main", "Cubemap | Rotation", 190, new ConfigDescription("", new AcceptableValueRange<float>(0, 360)));
+            CubemapTintH = Config.Bind<float>("Skybox", "Tint Hue", 0, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            CubemapTintS = Config.Bind<float>("Skybox", "Tint Saturation", 0, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            CubemapTintV = Config.Bind<float>("Skybox", "Tint Value", 1, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            CubemapExposure = Config.Bind<float>("Skybox", "Exposure", 0.375f, new ConfigDescription("", new AcceptableValueRange<float>(0, 8)));
+            CubemapRotation = Config.Bind<float>("Skybox", "Rotation", 190, new ConfigDescription("", new AcceptableValueRange<float>(0, 360)));
 
             CubemapTintH.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetCubemapTint(skyData.SkyboxMaterial); } };
             CubemapTintS.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetCubemapTint(skyData.SkyboxMaterial); } };
