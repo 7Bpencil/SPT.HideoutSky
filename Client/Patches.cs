@@ -5,8 +5,10 @@
 // LICENSE file in the root directory of this source tree.
 //
 
+using EFT;
 using EFT.Hideout;
 using SevenBoldPencil.Common;
+using System;
 using System.Reflection;
 using SPT.Reflection.Patching;
 using HarmonyLib;
@@ -54,6 +56,35 @@ namespace SevenBoldPencil.HideoutSky
         public static void Postfix()
 		{
 			Plugin.Instance.UnloadSkybox();
+		}
+	}
+
+	public class Patch_HideoutScreenOverlay_Show : ModulePatch
+	{
+        protected override MethodBase GetTargetMethod()
+        {
+			Type[] parameters = [typeof(HideoutPlayerOwner), typeof(bool), typeof(ISession), typeof(AreaData[]), typeof(HideoutScreenRear)];
+            return AccessTools.Method(typeof(HideoutScreenOverlay), nameof(HideoutScreenOverlay.Show));
+        }
+
+        [PatchPostfix]
+        public static void Postfix()
+		{
+			Plugin.Instance.OnHideoutScreenShow();
+		}
+	}
+
+	public class Patch_HideoutScreenOverlay_method_11 : ModulePatch
+	{
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(HideoutScreenOverlay), nameof(HideoutScreenOverlay.method_11));
+        }
+
+        [PatchPostfix]
+        public static void Postfix()
+		{
+			Plugin.Instance.OnHideoutScreenHide();
 		}
 	}
 }

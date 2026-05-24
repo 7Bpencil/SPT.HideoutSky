@@ -24,6 +24,7 @@ namespace SevenBoldPencil.HideoutSky
         public Material SkyboxMaterial;
         public Cubemap SkyboxCubemap;
         public Mesh SkyboxMesh;
+        public bool IsInMenu;
     }
 
     [BepInPlugin("7Bpencil.HideoutSky", "7Bpencil.HideoutSky", "1.0.0")]
@@ -37,6 +38,7 @@ namespace SevenBoldPencil.HideoutSky
         public static Plugin Instance;
 		public ManualLogSource LoggerInstance;
 
+        public static ConfigEntry<bool> SunlightIsEnabledInMenu;
         public static ConfigEntry<float> SunlightColorH;
         public static ConfigEntry<float> SunlightColorS;
         public static ConfigEntry<float> SunlightColorV;
@@ -59,6 +61,7 @@ namespace SevenBoldPencil.HideoutSky
             Instance = this;
 			LoggerInstance = Logger;
 
+            SunlightIsEnabledInMenu = Config.Bind<bool>("Sunlight", "Is Enabled in menu", false);
             SunlightColorH = Config.Bind<float>("Sunlight", "Color Hue", 0.08169935f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
             SunlightColorS = Config.Bind<float>("Sunlight", "Color Saturation", 0.12f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
             SunlightColorV = Config.Bind<float>("Sunlight", "Color Value", 1, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
@@ -68,6 +71,7 @@ namespace SevenBoldPencil.HideoutSky
             SunShadowType = Config.Bind<LightShadows>("Sunlight", "Shadow Type", LightShadows.Soft);
             SunShadowStrength = Config.Bind<float>("Sunlight", "Shadow Strength", 0.7f, new ConfigDescription("", new AcceptableValueRange<float>(0f, 1f)));
 
+            SunlightIsEnabledInMenu.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightInMenu(skyData.Sunlight, skyData.IsInMenu); } };
             SunlightColorH.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightColor(skyData.Sunlight); } };
             SunlightColorS.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightColor(skyData.Sunlight); } };
             SunlightColorV.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightColor(skyData.Sunlight); } };
@@ -91,6 +95,16 @@ namespace SevenBoldPencil.HideoutSky
 
             new Patch_HideoutController_HideoutAwake().Enable();
             new Patch_HideoutController_OnDestroy().Enable();
+            new Patch_HideoutScreenOverlay_Show().Enable();
+            new Patch_HideoutScreenOverlay_method_11().Enable();
+        }
+
+        public void SetSunlightInMenu(Light sunlight, bool isInMenu)
+        {
+            if (isInMenu)
+            {
+                sunlight.enabled = SunlightIsEnabledInMenu.Value;
+            }
         }
 
         public void SetSunlightColor(Light sunlight)
@@ -182,6 +196,7 @@ namespace SevenBoldPencil.HideoutSky
                 SkyboxMaterial = material,
                 SkyboxCubemap = cubemap,
                 SkyboxMesh = mesh,
+                IsInMenu = false,
             });
         }
 
@@ -230,6 +245,24 @@ namespace SevenBoldPencil.HideoutSky
                 Destroy(skyData.SkyboxCubemap);
                 Destroy(skyData.SkyboxMaterial);
                 Destroy(skyData.SkyboxMesh);
+            }
+        }
+
+        public void OnHideoutScreenShow()
+        {
+            if (SkyData.Some(out var skyData))
+            {
+                skyData.IsInMenu = false;
+                skyData.Sunlight.enabled = true;
+            }
+        }
+
+        public void OnHideoutScreenHide()
+        {
+            if (SkyData.Some(out var skyData))
+            {
+                skyData.IsInMenu = true;
+                SetSunlightInMenu(skyData.Sunlight, skyData.IsInMenu);
             }
         }
 
