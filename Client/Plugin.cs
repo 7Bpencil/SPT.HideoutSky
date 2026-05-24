@@ -93,9 +93,9 @@ namespace SevenBoldPencil.HideoutSky
             new Patch_HideoutController_OnDestroy().Enable();
         }
 
-        public void SetSunlightColor(Light sunLight)
+        public void SetSunlightColor(Light sunlight)
         {
-            sunLight.color = Color.HSVToRGB(SunlightColorH.Value, SunlightColorS.Value, SunlightColorV.Value);
+            sunlight.color = Color.HSVToRGB(SunlightColorH.Value, SunlightColorS.Value, SunlightColorV.Value);
         }
 
         public void SetSunAngle(Transform sunTransform)
@@ -103,19 +103,19 @@ namespace SevenBoldPencil.HideoutSky
             sunTransform.eulerAngles = new(SunElevationAngle.Value, SunAzimuthAngle.Value, 0);
         }
 
-        public void SetSunIntensity(Light sunLight)
+        public void SetSunIntensity(Light sunlight)
         {
-            sunLight.intensity = SunIntensity.Value;
+            sunlight.intensity = SunIntensity.Value;
         }
 
-        public void SetSunShadowType(Light sunLight)
+        public void SetSunShadowType(Light sunlight)
         {
-            sunLight.shadows = SunShadowType.Value;
+            sunlight.shadows = SunShadowType.Value;
         }
 
-        public void SetSunShadowStrength(Light sunLight)
+        public void SetSunShadowStrength(Light sunlight)
         {
-            sunLight.shadowStrength = SunShadowStrength.Value;
+            sunlight.shadowStrength = SunShadowStrength.Value;
         }
 
         public void SetSkyboxTint(Material skyboxMaterial)
@@ -162,8 +162,8 @@ namespace SevenBoldPencil.HideoutSky
                 meshRenderer.material = material;
             }
 
-            var sunLight = new GameObject("Sunlight");
-            var light = sunLight.AddComponent<Light>();
+            var sunlight = new GameObject("Sunlight");
+            var light = sunlight.AddComponent<Light>();
             var lightTransform = light.transform;
             {
                 light.type = LightType.Directional;
