@@ -159,6 +159,7 @@ namespace SevenBoldPencil.HideoutSky
                 SetSkyboxExposure(material);
                 SetSkyboxRotation(material);
                 material.SetTexture(_Tex, cubemap);
+                material.renderQueue = 3000; // otherwise skybox will disappear when user hits Tab
                 meshRenderer.material = material;
             }
 
