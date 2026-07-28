@@ -8,6 +8,7 @@
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
+using Comfort.Common;
 using Newtonsoft.Json;
 using SevenBoldPencil.Common;
 using System;
@@ -25,6 +26,7 @@ namespace SevenBoldPencil.HideoutSky
         public Cubemap SkyboxCubemap;
         public Mesh SkyboxMesh;
         public bool IsInMenu;
+        public Color OriginalAmbientColor;
     }
 
     [BepInPlugin("7Bpencil.HideoutSky", "7Bpencil.HideoutSky", "1.0.1")]
@@ -54,6 +56,10 @@ namespace SevenBoldPencil.HideoutSky
         public static ConfigEntry<float> SkyboxExposure;
         public static ConfigEntry<float> SkyboxRotation;
 
+        public static ConfigEntry<float> AmbientColorH;
+        public static ConfigEntry<float> AmbientColorS;
+        public static ConfigEntry<float> AmbientColorV;
+
         public Option<SkyData> SkyData;
 
         private void Awake()
@@ -71,15 +77,15 @@ namespace SevenBoldPencil.HideoutSky
             SunShadowType = Config.Bind<LightShadows>("Sunlight", "Shadow Type", LightShadows.Soft);
             SunShadowStrength = Config.Bind<float>("Sunlight", "Shadow Strength", 0.7f, new ConfigDescription("", new AcceptableValueRange<float>(0f, 1f)));
 
-            SunlightIsEnabledInMenu.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightInMenu(skyData.Sunlight, skyData.IsInMenu); } };
-            SunlightColorH.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightColor(skyData.Sunlight); } };
-            SunlightColorS.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightColor(skyData.Sunlight); } };
-            SunlightColorV.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightColor(skyData.Sunlight); } };
-            SunElevationAngle.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunAngle(skyData.SunlightTransform); } };
-            SunAzimuthAngle.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunAngle(skyData.SunlightTransform); } };
-            SunIntensity.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunIntensity(skyData.Sunlight); } };
-            SunShadowType.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunShadowType(skyData.Sunlight); } };
-            SunShadowStrength.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunShadowStrength(skyData.Sunlight); } };
+            SunlightIsEnabledInMenu.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightInMenu(skyData); } };
+            SunlightColorH.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightColor(skyData); } };
+            SunlightColorS.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightColor(skyData); } };
+            SunlightColorV.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunlightColor(skyData); } };
+            SunElevationAngle.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunAngle(skyData); } };
+            SunAzimuthAngle.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunAngle(skyData); } };
+            SunIntensity.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunIntensity(skyData); } };
+            SunShadowType.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunShadowType(skyData); } };
+            SunShadowStrength.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSunShadowStrength(skyData); } };
 
             SkyboxTintH = Config.Bind<float>("Skybox", "Tint Hue", 0, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
             SkyboxTintS = Config.Bind<float>("Skybox", "Tint Saturation", 0, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
@@ -87,11 +93,19 @@ namespace SevenBoldPencil.HideoutSky
             SkyboxExposure = Config.Bind<float>("Skybox", "Exposure", 0.375f, new ConfigDescription("", new AcceptableValueRange<float>(0, 8)));
             SkyboxRotation = Config.Bind<float>("Skybox", "Rotation", 190, new ConfigDescription("", new AcceptableValueRange<float>(0, 360)));
 
-            SkyboxTintH.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxTint(skyData.SkyboxMaterial); } };
-            SkyboxTintS.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxTint(skyData.SkyboxMaterial); } };
-            SkyboxTintV.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxTint(skyData.SkyboxMaterial); } };
-            SkyboxExposure.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxExposure(skyData.SkyboxMaterial); } };
-            SkyboxRotation.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxRotation(skyData.SkyboxMaterial); } };
+            SkyboxTintH.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxTint(skyData); } };
+            SkyboxTintS.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxTint(skyData); } };
+            SkyboxTintV.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxTint(skyData); } };
+            SkyboxExposure.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxExposure(skyData); } };
+            SkyboxRotation.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetSkyboxRotation(skyData); } };
+
+            AmbientColorH = Config.Bind<float>("Ambient", "Color Hue", 0.08169935f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            AmbientColorS = Config.Bind<float>("Ambient", "Color Saturation", 0.12f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+            AmbientColorV = Config.Bind<float>("Ambient", "Color Value", 0.35f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
+
+            AmbientColorH.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetAmbientColor(skyData); } };
+            AmbientColorS.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetAmbientColor(skyData); } };
+            AmbientColorV.SettingChanged += (_, _) => { if (SkyData.Some(out var skyData)) { SetAmbientColor(skyData); } };
 
             new Patch_HideoutController_HideoutAwake().Enable();
             new Patch_HideoutController_OnDestroy().Enable();
@@ -99,52 +113,60 @@ namespace SevenBoldPencil.HideoutSky
             new Patch_HideoutScreenOverlay_method_11().Enable();
         }
 
-        public void SetSunlightInMenu(Light sunlight, bool isInMenu)
+        public void SetSunlightInMenu(SkyData skyData)
         {
-            if (isInMenu)
+            if (skyData.IsInMenu)
             {
-                sunlight.enabled = SunlightIsEnabledInMenu.Value;
+                skyData.Sunlight.enabled = SunlightIsEnabledInMenu.Value;
+                SetAmbientColor(skyData);
             }
         }
 
-        public void SetSunlightColor(Light sunlight)
+        public void SetSunlightColor(SkyData skyData)
         {
-            sunlight.color = Color.HSVToRGB(SunlightColorH.Value, SunlightColorS.Value, SunlightColorV.Value);
+            skyData.Sunlight.color = Color.HSVToRGB(SunlightColorH.Value, SunlightColorS.Value, SunlightColorV.Value);
         }
 
-        public void SetSunAngle(Transform sunTransform)
+        public void SetSunAngle(SkyData skyData)
         {
-            sunTransform.eulerAngles = new(SunElevationAngle.Value, SunAzimuthAngle.Value, 0);
+            skyData.SunlightTransform.eulerAngles = new(SunElevationAngle.Value, SunAzimuthAngle.Value, 0);
         }
 
-        public void SetSunIntensity(Light sunlight)
+        public void SetSunIntensity(SkyData skyData)
         {
-            sunlight.intensity = SunIntensity.Value;
+            skyData.Sunlight.intensity = SunIntensity.Value;
         }
 
-        public void SetSunShadowType(Light sunlight)
+        public void SetSunShadowType(SkyData skyData)
         {
-            sunlight.shadows = SunShadowType.Value;
+            skyData.Sunlight.shadows = SunShadowType.Value;
         }
 
-        public void SetSunShadowStrength(Light sunlight)
+        public void SetSunShadowStrength(SkyData skyData)
         {
-            sunlight.shadowStrength = SunShadowStrength.Value;
+            skyData.Sunlight.shadowStrength = SunShadowStrength.Value;
         }
 
-        public void SetSkyboxTint(Material skyboxMaterial)
+        public void SetSkyboxTint(SkyData skyData)
         {
-            skyboxMaterial.SetColor(_Tint, Color.HSVToRGB(SkyboxTintH.Value, SkyboxTintS.Value, SkyboxTintV.Value));
+            skyData.SkyboxMaterial.SetColor(_Tint, Color.HSVToRGB(SkyboxTintH.Value, SkyboxTintS.Value, SkyboxTintV.Value));
         }
 
-        public void SetSkyboxExposure(Material skyboxMaterial)
+        public void SetSkyboxExposure(SkyData skyData)
         {
-            skyboxMaterial.SetFloat(_Exposure, SkyboxExposure.Value);
+            skyData.SkyboxMaterial.SetFloat(_Exposure, SkyboxExposure.Value);
         }
 
-        public void SetSkyboxRotation(Material skyboxMaterial)
+        public void SetSkyboxRotation(SkyData skyData)
         {
-            skyboxMaterial.SetFloat(_Rotation, SkyboxRotation.Value);
+            skyData.SkyboxMaterial.SetFloat(_Rotation, SkyboxRotation.Value);
+        }
+
+        public void SetAmbientColor(SkyData skyData)
+        {
+            var customColor = Color.HSVToRGB(AmbientColorH.Value, AmbientColorS.Value, AmbientColorV.Value);
+            var isCustomColor = !skyData.IsInMenu || SunlightIsEnabledInMenu.Value;
+            Singleton<LevelSettings>.Instance.SkyColor = isCustomColor ? customColor : skyData.OriginalAmbientColor;
         }
 
         public void LoadSkybox()
@@ -169,9 +191,6 @@ namespace SevenBoldPencil.HideoutSky
             var material = new Material(Shader.Find("Skybox/Cubemap"));
             var cubemap = LoadCubemap(Path.Combine(assemblyDir, "assets", "cubemap"));
             {
-                SetSkyboxTint(material);
-                SetSkyboxExposure(material);
-                SetSkyboxRotation(material);
                 material.SetTexture(_Tex, cubemap);
                 material.renderQueue = 3000; // otherwise skybox will disappear when user hits Tab
                 meshRenderer.material = material;
@@ -182,14 +201,9 @@ namespace SevenBoldPencil.HideoutSky
             var lightTransform = light.transform;
             {
                 light.type = LightType.Directional;
-                SetSunlightColor(light);
-                SetSunAngle(lightTransform);
-                SetSunIntensity(light);
-                SetSunShadowType(light);
-                SetSunShadowStrength(light);
             }
 
-            SkyData = new(new()
+            var skyData = new SkyData()
             {
                 Sunlight = light,
                 SunlightTransform = lightTransform,
@@ -197,7 +211,22 @@ namespace SevenBoldPencil.HideoutSky
                 SkyboxCubemap = cubemap,
                 SkyboxMesh = mesh,
                 IsInMenu = false,
-            });
+                OriginalAmbientColor = Singleton<LevelSettings>.Instance.SkyColor,
+            };
+
+            SetSunlightColor(skyData);
+            SetSunAngle(skyData);
+            SetSunIntensity(skyData);
+            SetSunShadowType(skyData);
+            SetSunShadowStrength(skyData);
+
+            SetSkyboxTint(skyData);
+            SetSkyboxExposure(skyData);
+            SetSkyboxRotation(skyData);
+
+            SetAmbientColor(skyData);
+
+            SkyData = new(skyData);
         }
 
         public static Cubemap LoadCubemap(string directoryPath)
@@ -254,6 +283,7 @@ namespace SevenBoldPencil.HideoutSky
             {
                 skyData.IsInMenu = false;
                 skyData.Sunlight.enabled = true;
+                SetAmbientColor(skyData);
             }
         }
 
@@ -262,7 +292,7 @@ namespace SevenBoldPencil.HideoutSky
             if (SkyData.Some(out var skyData))
             {
                 skyData.IsInMenu = true;
-                SetSunlightInMenu(skyData.Sunlight, skyData.IsInMenu);
+                SetSunlightInMenu(skyData);
             }
         }
 
