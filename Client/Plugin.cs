@@ -29,7 +29,7 @@ namespace SevenBoldPencil.HideoutSky
         public Color OriginalAmbientColor;
     }
 
-    [BepInPlugin("7Bpencil.HideoutSky", "7Bpencil.HideoutSky", "1.1.0")]
+    [BepInPlugin("7Bpencil.HideoutSky", "7Bpencil.HideoutSky", "1.2.0")]
     public class Plugin : BaseUnityPlugin
     {
         public static readonly int _Tint = Shader.PropertyToID("_Tint");
