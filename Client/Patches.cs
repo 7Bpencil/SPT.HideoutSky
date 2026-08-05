@@ -8,9 +8,7 @@
 using EFT;
 using EFT.Interactive;
 using EFT.Hideout;
-using SevenBoldPencil.Common;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using SPT.Reflection.Patching;
 using HarmonyLib;
@@ -19,34 +17,6 @@ using UnityEngine.SceneManagement;
 
 namespace SevenBoldPencil.HideoutSky
 {
-	public struct HideoutCustomizationItemsInstaller_Proxy
-	{
-		private static TypedFieldInfo<HideoutCustomizationItemsInstaller, HideoutCustomizationItemModelSpawnPoint> __ceilingPoint = new("_ceilingPoint");
-
-		public HideoutCustomizationItemModelSpawnPoint _ceilingPoint { get { return __ceilingPoint.Get(__instance); } set { __ceilingPoint.Set(__instance, value); } }
-
-        private HideoutCustomizationItemsInstaller __instance;
-
-        public HideoutCustomizationItemsInstaller_Proxy(HideoutCustomizationItemsInstaller instance)
-        {
-            __instance = instance;
-        }
-	}
-
-	public struct LightLevel_Proxy
-	{
-		private static TypedFieldInfo<LightLevel, List<ILightSwitcher>> __lightSwitchers = new("_lightSwitchers");
-
-		public List<ILightSwitcher> _lightSwitchers { get { return __lightSwitchers.Get(__instance); } set { __lightSwitchers.Set(__instance, value); } }
-
-        private LightLevel __instance;
-
-        public LightLevel_Proxy(LightLevel instance)
-        {
-            __instance = instance;
-        }
-	}
-
 	public class Patch_HideoutController_HideoutAwake : ModulePatch
 	{
         protected override MethodBase GetTargetMethod()
@@ -57,7 +27,7 @@ namespace SevenBoldPencil.HideoutSky
         [PatchPostfix]
         public static void Postfix(HideoutController __instance, HideoutCustomizationItemsInstaller ___CustomizationItemsInstaller)
 		{
-			var ceiling = new HideoutCustomizationItemsInstaller_Proxy(___CustomizationItemsInstaller)._ceilingPoint;
+			var ceiling = ___CustomizationItemsInstaller._ceilingPoint;
 			ceiling.gameObject.SetActive(false);
 
 			foreach (var (areaType, area) in __instance.Areas)
@@ -73,7 +43,7 @@ namespace SevenBoldPencil.HideoutSky
 					{
 						continue;
 					}
-					var lightSwitchers = new LightLevel_Proxy(lightLevel)._lightSwitchers;
+					var lightSwitchers = lightLevel._lightSwitchers;
 					foreach (var lightSwitcher in lightSwitchers)
 					{
 						HideLightSwitcherMesh(lightSwitcher);
