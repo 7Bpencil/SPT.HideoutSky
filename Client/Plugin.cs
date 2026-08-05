@@ -110,7 +110,7 @@ namespace SevenBoldPencil.HideoutSky
             new Patch_HideoutController_HideoutAwake().Enable();
             new Patch_HideoutController_OnDestroy().Enable();
             new Patch_HideoutScreenOverlay_Show().Enable();
-            new Patch_HideoutScreenOverlay_method_11().Enable();
+            new Patch_HideoutScreenOverlay_ReturnToHomeScreen().Enable();
         }
 
         public void SetSunlightInMenu(SkyData skyData)

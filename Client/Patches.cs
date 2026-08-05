@@ -35,9 +35,9 @@ namespace SevenBoldPencil.HideoutSky
 
 	public struct LightLevel_Proxy
 	{
-		private static TypedFieldInfo<LightLevel, List<GInterface467>> __lightSwitchers = new("_lightSwitchers");
+		private static TypedFieldInfo<LightLevel, List<ILightSwitcher>> __lightSwitchers = new("_lightSwitchers");
 
-		public List<GInterface467> _lightSwitchers { get { return __lightSwitchers.Get(__instance); } set { __lightSwitchers.Set(__instance, value); } }
+		public List<ILightSwitcher> _lightSwitchers { get { return __lightSwitchers.Get(__instance); } set { __lightSwitchers.Set(__instance, value); } }
 
         private LightLevel __instance;
 
@@ -94,7 +94,7 @@ namespace SevenBoldPencil.HideoutSky
 				}
 			}
 
-			var hideoutScene = SceneManager.GetSceneByName(SceneResourceKeyAbstractClass.HideoutSceneName);
+			var hideoutScene = SceneManager.GetSceneByName(Scenes.HideoutSceneName);
 			if (hideoutScene.IsValid())
 			{
 				foreach (var root in hideoutScene.GetRootGameObjects())
@@ -117,7 +117,7 @@ namespace SevenBoldPencil.HideoutSky
 			Plugin.Instance.LoadSkybox();
 		}
 
-		public static void HideLightSwitcherMesh(GInterface467 lightSwitcher)
+		public static void HideLightSwitcherMesh(ILightSwitcher lightSwitcher)
 		{
 			// lightSwitcher can be: CandleSwitcher, GarlandSwitcher, LampController,
 			// but only garland and lamps can be on the ceiling
@@ -161,7 +161,7 @@ namespace SevenBoldPencil.HideoutSky
 	{
         protected override MethodBase GetTargetMethod()
         {
-			Type[] parameters = [typeof(HideoutPlayerOwner), typeof(bool), typeof(ISession), typeof(AreaData[]), typeof(HideoutScreenRear)];
+			Type[] parameters = [typeof(HideoutPlayerOwner), typeof(bool), typeof(IEftSession), typeof(AreaData[]), typeof(HideoutScreenRear)];
             return AccessTools.Method(typeof(HideoutScreenOverlay), nameof(HideoutScreenOverlay.Show));
         }
 
@@ -172,11 +172,11 @@ namespace SevenBoldPencil.HideoutSky
 		}
 	}
 
-	public class Patch_HideoutScreenOverlay_method_11 : ModulePatch
+	public class Patch_HideoutScreenOverlay_ReturnToHomeScreen : ModulePatch
 	{
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(HideoutScreenOverlay), nameof(HideoutScreenOverlay.method_11));
+            return AccessTools.Method(typeof(HideoutScreenOverlay), nameof(HideoutScreenOverlay.ReturnToHomeScreen));
         }
 
         [PatchPostfix]
