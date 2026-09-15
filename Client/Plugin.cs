@@ -6,6 +6,7 @@
 //
 
 using BepInEx;
+using BepInEx.Unity.IL2CPP;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using Comfort.Common;
@@ -30,7 +31,7 @@ namespace SevenBoldPencil.HideoutSky
     }
 
     [BepInPlugin("7Bpencil.HideoutSky", "7Bpencil.HideoutSky", "1.2.0")]
-    public class Plugin : BaseUnityPlugin
+    public class Plugin : BasePlugin
     {
         public static readonly int _Tint = Shader.PropertyToID("_Tint");
         public static readonly int _Exposure = Shader.PropertyToID("_Exposure");
@@ -62,10 +63,10 @@ namespace SevenBoldPencil.HideoutSky
 
         public Option<SkyData> SkyData;
 
-        private void Awake()
+        public override void Load()
         {
             Instance = this;
-			LoggerInstance = Logger;
+			LoggerInstance = Log;
 
             SunlightIsEnabledInMenu = Config.Bind<bool>("Sunlight", "Is Enabled in menu", false);
             SunlightColorH = Config.Bind<float>("Sunlight", "Color Hue", 0.08169935f, new ConfigDescription("", new AcceptableValueRange<float>(0, 1)));
@@ -251,7 +252,7 @@ namespace SevenBoldPencil.HideoutSky
 
             cube.Apply();
 
-            Destroy(texture);
+            GameObject.Destroy(texture);
 
             return cube;
         }
@@ -271,9 +272,9 @@ namespace SevenBoldPencil.HideoutSky
             if (SkyData.Some(out var skyData))
             {
                 SkyData = default;
-                Destroy(skyData.SkyboxCubemap);
-                Destroy(skyData.SkyboxMaterial);
-                Destroy(skyData.SkyboxMesh);
+                GameObject.Destroy(skyData.SkyboxCubemap);
+                GameObject.Destroy(skyData.SkyboxMaterial);
+                GameObject.Destroy(skyData.SkyboxMesh);
             }
         }
 

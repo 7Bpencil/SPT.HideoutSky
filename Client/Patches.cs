@@ -10,7 +10,7 @@ using EFT.Interactive;
 using EFT.Hideout;
 using System;
 using System.Reflection;
-using SPT.Reflection.Patching;
+using SPTushonka.Reflection.Patching;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -25,9 +25,9 @@ namespace SevenBoldPencil.HideoutSky
         }
 
         [PatchPostfix]
-        public static void Postfix(HideoutController __instance, HideoutCustomizationItemsInstaller ___CustomizationItemsInstaller)
+        public static void Postfix(HideoutController __instance)
 		{
-			var ceiling = ___CustomizationItemsInstaller._ceilingPoint;
+			var ceiling = __instance.CustomizationItemsInstaller._ceilingPoint;
 			ceiling.gameObject.SetActive(false);
 
 			foreach (var (areaType, area) in __instance.Areas)
